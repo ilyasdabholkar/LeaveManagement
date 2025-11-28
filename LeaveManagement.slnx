@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Frontend/" />
+  <Folder Name="/Services/">
+    <Project Path="Services/Auth.API/Auth.API.csproj" />
+    <Project Path="Services/Employee.API/Employee.API.csproj" />
+    <Project Path="Services/Leave.API/Leave.API.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="959b7dbd-7708-4364-ad48-8a3eb7847f84" />
+    <Project Path="Services/Notification.API/Notification.API.esproj">
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
+</Solution>
