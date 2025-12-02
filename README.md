@@ -52,15 +52,15 @@ The Leave Management System is a distributed microservices application designed 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Frontend UI (React)                      │
+│                    Frontend UI (React)                      │
 │                      Port: 3000                             │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    API Gateway (Express)                     │
+│                   API Gateway (Express)                     │
 │                      Port: 8080                             │
-│                                                              │
+│                                                             │
 │  Routes all requests to appropriate microservices           │
 └───┬──────────────┬──────────────┬──────────────┬───────────┘
     │              │              │              │
