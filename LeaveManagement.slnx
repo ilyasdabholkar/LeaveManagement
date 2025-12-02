@@ -9,4 +9,7 @@
       <Deploy />
     </Project>
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="C:/Users/Ilyas/Downloads/LeaveManagement.postman_collection.json" />
+  </Folder>
 </Solution>
