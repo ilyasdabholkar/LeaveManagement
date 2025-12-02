@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/api';
 import { API_ENDPOINTS } from '../../config/api';
+import { AuthService } from '../../services/authService';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,16 +32,17 @@ const Login = () => {
         password: formData.password,
       });
 
-      if (response.data.success) {
+      if (response.data) {
         const token = response.data.data.accessToken;
-        const userData = response.data.data.user || response.data.data;
-        const role = userData.role || 'EMPLOYEE';
-        
+      
         localStorage.setItem('token', token);
+        const userDetails = AuthService.getUserFromToken();
+        
+        const role = userDetails?.role;
         localStorage.setItem('user', JSON.stringify({
           email: formData.email,
-          role: role,
-          ...userData,
+          userId: userDetails?.userId,
+          role: userDetails?.role
         }));
         
         // Redirect based on role

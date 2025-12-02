@@ -1,20 +1,24 @@
 // API Gateway base URL
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
+const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_URL 
+const EMPLOYEE_API_BASE_URL = process.env.REACT_APP_EMPLOYEE_URL 
+
+
 // API endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
   auth: {
-    login: `${API_BASE_URL}/api/auth/authenticate`,
-    register: `${API_BASE_URL}/api/auth/register`,
+    login: `${AUTH_API_BASE_URL}/api/auth/authenticate`,
+    register: `${AUTH_API_BASE_URL}/api/auth/register`,
   },
   // Employee endpoints
   employees: {
-    list: `${API_BASE_URL}/api/employees`,
-    get: (id) => `${API_BASE_URL}/api/employees/${id}`,
-    create: `${API_BASE_URL}/api/employees`,
-    update: (id) => `${API_BASE_URL}/api/employees/${id}`,
-    delete: (id) => `${API_BASE_URL}/api/employees/${id}`,
+    list: `${EMPLOYEE_API_BASE_URL}/api/employees`,
+    get: (id) => `${EMPLOYEE_API_BASE_URL}/api/employees/${id}`,
+    create: `${EMPLOYEE_API_BASE_URL}/api/employees`,
+    update: (id) => `${EMPLOYEE_API_BASE_URL}/api/employees/${id}`,
+    delete: (id) => `${EMPLOYEE_API_BASE_URL}/api/employees/${id}`,
   },
   // Leave endpoints
   leave: {

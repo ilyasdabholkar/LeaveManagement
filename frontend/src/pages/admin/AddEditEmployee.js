@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../../services/api';
 import { API_ENDPOINTS } from '../../config/api';
+import { createEmployee,updateEmployee,getEmployeeById } from '../../services/employeeService';
 
 const AddEditEmployee = () => {
   const navigate = useNavigate();
@@ -9,8 +10,8 @@ const AddEditEmployee = () => {
   const isEdit = !!id;
 
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     department: '',
@@ -30,17 +31,17 @@ const AddEditEmployee = () => {
 
   const fetchEmployee = async () => {
     try {
-      const response = await apiClient.get(API_ENDPOINTS.employees.get(id));
-      if (response.data.success) {
-        const employee = response.data.data;
+      const response = await getEmployeeById(id);
+      if (response.status && response.data != null) {
+        const employee = response.data;
         setFormData({
-          first_name: employee.first_name || '',
-          last_name: employee.last_name || '',
+          firstName: employee.firstName || '',
+          lastName: employee.lastName || '',
           email: employee.email || '',
           phone: employee.phone || '',
           department: employee.department || '',
           designation: employee.designation || '',
-          join_date: employee.join_date ? employee.join_date.split('T')[0] : '',
+          join_date: employee.joinDate ? employee.joinDate.split('T')[0] : '',
           status: employee.status || 'ACTIVE',
         });
       }
@@ -68,12 +69,12 @@ const AddEditEmployee = () => {
     try {
       let response;
       if (isEdit) {
-        response = await apiClient.put(API_ENDPOINTS.employees.update(id), formData);
+        response = await updateEmployee(id,formData);
       } else {
-        response = await apiClient.post(API_ENDPOINTS.employees.create, formData);
+        response = await createEmployee(formData);
       }
 
-      if (response.data.success) {
+      if (response.status == true && response.data) {
         setSuccess(isEdit ? 'Employee updated successfully!' : 'Employee created successfully!');
         setTimeout(() => {
           navigate('/admin/employees');
@@ -116,14 +117,14 @@ const AddEditEmployee = () => {
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
                   First Name *
                 </label>
                 <input
                   type="text"
-                  id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleChange}
                   required
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
@@ -131,14 +132,14 @@ const AddEditEmployee = () => {
               </div>
 
               <div>
-                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
                   Last Name *
                 </label>
                 <input
                   type="text"
-                  id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleChange}
                   required
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"

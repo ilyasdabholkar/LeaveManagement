@@ -1,5 +1,4 @@
 <Solution>
-  <Folder Name="/Frontend/" />
   <Folder Name="/Services/">
     <Project Path="Services/Auth.API/Auth.API.csproj" />
     <Project Path="Services/Employee.API/Employee.API.csproj" />
@@ -12,4 +11,8 @@
   <Folder Name="/Solution Items/">
     <File Path="C:/Users/Ilyas/Downloads/LeaveManagement.postman_collection.json" />
   </Folder>
+  <Project Path="Frontend/frontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>

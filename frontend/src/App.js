@@ -126,6 +126,17 @@ function App() {
           }
         />
 
+        <Route
+          path="/admin/users"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <UserList />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
         {/* Shared Routes */}
         <Route
           path="/leaves/:id"

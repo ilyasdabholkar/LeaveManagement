@@ -55,7 +55,7 @@ const Layout = ({ children }) => {
                 >
                   Leave Status
                 </Link>
-                <Link
+                {user.role == 'ADMIN' ?<Link
                   to="/admin/approve-leave"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/admin/approve-leave')
@@ -64,8 +64,8 @@ const Layout = ({ children }) => {
                   }`}
                 >
                   Approve Leave
-                </Link>
-                <Link
+                </Link> : <></>}
+                {user.role == 'ADMIN' ?<Link
                   to="/admin/users"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/admin/users')
@@ -74,8 +74,8 @@ const Layout = ({ children }) => {
                   }`}
                 >
                   Users
-                </Link>
-                <Link
+                </Link>  : <></>}
+                {user.role == 'ADMIN' ? <Link
                   to="/developer/notifications"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/developer/notifications')
@@ -84,7 +84,7 @@ const Layout = ({ children }) => {
                   }`}
                 >
                   Notification Testing
-                </Link>
+                </Link> : <></>}
               </div>
             </div>
             <div className="flex items-center">
