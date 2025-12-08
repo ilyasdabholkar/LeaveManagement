@@ -1,0 +1,226 @@
+{
+  "info": {
+    "name": "Leave Service API",
+    "_postman_id": "11111111-2222-3333-4444-555555555555",
+    "description": "Postman collection for the Flask Leave microservice (Leave Management System).\nBase URL: {{baseUrl}} (default http://localhost:5555)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Apply Leave",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employee_id\": \"1111-2222-3333-4444\",\n  \"leave_type\": \"PAID\",\n  \"start_date\": \"2025-12-10\",\n  \"end_date\": \"2025-12-12\",\n  \"reason\": \"Testing apply from Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/leave/apply",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "leave",
+            "apply"
+          ]
+        },
+        "description": "Apply for leave.\n\nNOTE:\n- Allowed leave_type: ANNUAL, SICK, CASUAL, UNPAID, PAID\n- Requires Authorization: Bearer {{authToken}} unless SKIP_AUTH=True on the service."
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Leaves",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/leave?status={{status}}&employee_id={{employeeId}}&limit={{limit}}&offset={{offset}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "leave"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "{{status}}",
+              "description": "Optional: PENDING, APPROVED, REJECTED, CANCELLED"
+            },
+            {
+              "key": "employee_id",
+              "value": "{{employeeId}}",
+              "description": "Optional: filter by employee id"
+            },
+            {
+              "key": "limit",
+              "value": "{{limit}}",
+              "description": "Optional: default 100"
+            },
+            {
+              "key": "offset",
+              "value": "{{offset}}",
+              "description": "Optional: default 0"
+            }
+          ]
+        },
+        "description": "List leaves with optional filters.\nResponse includes: success, data, total, limit, offset, message."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Leave By Id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/leave/{{leaveId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "leave",
+            "{{leaveId}}"
+          ]
+        },
+        "description": "Get a specific leave by its id.\nSet the collection/environment variable {{leaveId}} to a valid leave id."
+      },
+      "response": []
+    },
+    {
+      "name": "Approve Leave",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"APPROVED\",\n  \"approved_by\": \"admin-uuid-1234\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/leave/{{leaveId}}/approve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "leave",
+            "{{leaveId}}",
+            "approve"
+          ]
+        },
+        "description": "Approve a leave.\nBody must have:\n- status: \"APPROVED\"\n- approved_by: admin/manager id\nRequires Authorization: Bearer {{authToken}}."
+      },
+      "response": []
+    },
+    {
+      "name": "Reject Leave",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{authToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"REJECTED\",\n  \"approved_by\": \"admin-uuid-1234\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/leave/{{leaveId}}/reject",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "leave",
+            "{{leaveId}}",
+            "reject"
+          ]
+        },
+        "description": "Reject a leave.\nBody must have:\n- status: \"REJECTED\"\n- approved_by: admin/manager id\nRequires Authorization: Bearer {{authToken}}."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5555"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "description": "JWT token from Auth service. Leave empty if SKIP_AUTH=True on the Leave service."
+    },
+    {
+      "key": "leaveId",
+      "value": "test-leave-1",
+      "description": "Sample leave id. Replace with a real one from Get All Leaves."
+    },
+    {
+      "key": "status",
+      "value": "",
+      "description": "Optional status filter for Get All Leaves."
+    },
+    {
+      "key": "employeeId",
+      "value": "",
+      "description": "Optional employee_id filter."
+    },
+    {
+      "key": "limit",
+      "value": "100"
+    },
+    {
+      "key": "offset",
+      "value": "0"
+    }
+  ]
+}
