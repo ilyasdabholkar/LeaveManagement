@@ -10,7 +10,7 @@ async function logNotification(logData) {
         const { type, recipient, message, status, subject, error } = logData;
         
         const log = new NotificationLog({
-            type: type.toUpperCase(), // EMAIL or SMS
+            type: type.toUpperCase(), 
             recipient,
             message,
             status: status.toUpperCase(), // SUCCESS or FAILED

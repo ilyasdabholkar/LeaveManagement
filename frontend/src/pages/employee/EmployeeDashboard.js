@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import apiClient from '../../services/api';
-import { API_ENDPOINTS } from '../../config/api';
+import { getLeavesByEmployee } from '../../services/leaveService';
 
 const EmployeeDashboard = () => {
   const [stats, setStats] = useState({
@@ -22,9 +21,7 @@ const EmployeeDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch employee's leaves
-      const response = await apiClient.get(`${API_ENDPOINTS.leave.list}?employeeId=${user.id || user.userId}`);
-      const leaves = response.data?.data || [];
+      const leaves = await getLeavesByEmployee(user);
 
       const pending = leaves.filter(l => l.status === 'PENDING').length;
       const approved = leaves.filter(l => l.status === 'APPROVED').length;
@@ -37,17 +34,9 @@ const EmployeeDashboard = () => {
         rejectedLeaves: rejected,
       });
 
-      // Get recent leaves (last 5)
       setRecentLeaves(leaves.slice(0, 5));
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      // Mock data for development
-      setStats({
-        totalLeaves: 12,
-        pendingLeaves: 3,
-        approvedLeaves: 8,
-        rejectedLeaves: 1,
-      });
     } finally {
       setLoading(false);
     }
@@ -151,10 +140,10 @@ const EmployeeDashboard = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">
-                          {leave.leaveType}
+                          {leave.leave_type}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
+                          {leave.start_date} - {leave.end_date}
                         </p>
                       </div>
                       <div className="ml-4">

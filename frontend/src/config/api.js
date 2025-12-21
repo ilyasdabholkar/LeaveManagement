@@ -3,7 +3,7 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8
 
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_URL 
 const EMPLOYEE_API_BASE_URL = process.env.REACT_APP_EMPLOYEE_URL 
-
+const LEAVE_API_BASE_URL = process.env.REACT_APP_LEAVE_URL
 
 // API endpoints
 export const API_ENDPOINTS = {
@@ -22,12 +22,12 @@ export const API_ENDPOINTS = {
   },
   // Leave endpoints
   leave: {
-    list: `${API_BASE_URL}/api/leave`,
-    get: (id) => `${API_BASE_URL}/api/leave/${id}`,
-    apply: `${API_BASE_URL}/api/leave/apply`,
-    approve: (id) => `${API_BASE_URL}/api/leave/${id}/approve`,
-    reject: (id) => `${API_BASE_URL}/api/leave/${id}/reject`,
-    status: (id) => `${API_BASE_URL}/api/leave/${id}/status`,
+    list: `${LEAVE_API_BASE_URL}/api/leave`,
+    get: (id) => `${LEAVE_API_BASE_URL}/api/leave/${id}`,
+    apply: `${LEAVE_API_BASE_URL}/api/leave/apply`,
+    approve: (id) => `${LEAVE_API_BASE_URL}/api/leave/${id}/approve`,
+    reject: (id) => `${LEAVE_API_BASE_URL}/api/leave/${id}/reject`,
+    status: (id) => `${LEAVE_API_BASE_URL}/api/leave/${id}/status`,
   },
   // Notification endpoints
   notifications: {

@@ -7,8 +7,8 @@ import Login from './pages/user/Login';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
-import ApplyLeave from './pages/user/ApplyLeave';
-import MyLeaves from './pages/employee/MyLeaves';
+import ApplyLeave from './pages/leave/ApplyLeave';
+import MyLeaves from './pages/leave/MyLeaves';
 import LeaveDetails from './pages/leave/LeaveDetails';
 
 // Admin Pages
@@ -16,7 +16,6 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ApproveLeave from './pages/admin/ApproveLeave';
 import UserList from './pages/admin/UserList';
 import AddEditEmployee from './pages/admin/AddEditEmployee';
-import NotificationLogs from './pages/admin/NotificationLogs';
 
 // Developer Pages
 import NotificationTesting from './pages/developer/NotificationTesting';
@@ -111,16 +110,6 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <ApproveLeave />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/notification-logs"
-          element={
-            <PrivateRoute>
-              <Layout>
-                <NotificationLogs />
               </Layout>
             </PrivateRoute>
           }

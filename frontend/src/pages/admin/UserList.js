@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { getEmployees, deleteEmployee } from "../../services/employeeService";
+import { AuthService } from "../../services/authService";
+import { FiEdit2, FiTrash2, FiKey } from "react-icons/fi";
+
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -10,6 +13,11 @@ const UserList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [showCredentialModal, setShowCredentialModal] = useState(false);
+  const [credentialUser, setCredentialUser] = useState(null);
+  const [password, setPassword] = useState("");
+  const [assigning, setAssigning] = useState(false);
+
   const navigate = useNavigate();
 
   const fetchEmployees = async () => {
@@ -17,7 +25,7 @@ const UserList = () => {
       setLoading(true);
       const response = await getEmployees();
       console.log(response.data);
-      setUsers(response.data); // response is ApiResponse, users are in .data
+      setUsers(response.data);
     } catch (ex) {
       console.error("FetchEmployees : ", ex);
     } finally {
@@ -50,14 +58,47 @@ const UserList = () => {
     if (!selectedUser) return;
     try {
       setDeleting(true);
-      await deleteEmployee(selectedUser.id); // call service
-      // Remove from list locally
+      await deleteEmployee(selectedUser.id);
       setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id));
       handleCancelDelete();
     } catch (ex) {
       console.error("DeleteEmployee : ", ex);
-      // you can show toast / error message here
       setDeleting(false);
+    }
+  };
+
+  const handleAssignCredentials = (user) => {
+    setCredentialUser(user);
+    setPassword("");
+    setShowCredentialModal(true);
+  };
+
+  const handleCloseCredentialModal = () => {
+    setShowCredentialModal(false);
+    setCredentialUser(null);
+    setPassword("");
+    setAssigning(false);
+  };
+
+  const handleSubmitCredentials = async () => {
+    if (!password) return;
+
+    try {
+      setAssigning(true);
+
+      await AuthService.assignCredentials({
+        id: credentialUser.id,
+        email: credentialUser.email,
+        role: "EMPLOYEE",
+        password,
+      });
+
+      handleCloseCredentialModal();
+      alert("Credentials assigned successfully");
+    } catch (error) {
+      console.error("AssignCredentials:", error);
+      alert(error?.message || "Failed to assign credentials");
+      setAssigning(false);
     }
   };
 
@@ -80,7 +121,7 @@ const UserList = () => {
         </div>
 
         <button
-          onClick={() => navigate('/admin/employees/add')}
+          onClick={() => navigate("/admin/employees/add")}
           className="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
         >
           Add New
@@ -155,18 +196,36 @@ const UserList = () => {
                         {new Date(user.joinDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          className="text-primary-600 hover:text-primary-900 mr-4"
-                          onClick={() => navigate(`/admin/employees/edit/${user.id}`)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          onClick={() => handleDeleteClick(user)}
-                        >
-                          Delete
-                        </button>
+                        <div className="flex items-center gap-4">
+                          {/* Edit */}
+                          <button
+                            title="Edit User"
+                            onClick={() =>
+                              navigate(`/admin/employees/edit/${user.id}`)
+                            }
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            <FiEdit2 size={18} />
+                          </button>
+
+                          {/* Assign Credentials */}
+                          <button
+                            title="Assign Credentials"
+                            onClick={() => handleAssignCredentials(user)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            <FiKey size={18} />
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            title="Delete User"
+                            onClick={() => handleDeleteClick(user)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <FiTrash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -177,6 +236,52 @@ const UserList = () => {
         </div>
       </div>
 
+      {showCredentialModal && credentialUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              Assign Credentials
+            </h2>
+
+            <p className="text-sm text-gray-600 mb-4">
+              Assign login credentials for{" "}
+              <span className="font-medium">
+                {credentialUser.firstName} {credentialUser.lastName}
+              </span>
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+                placeholder="Enter password"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCloseCredentialModal}
+                className="px-4 py-2 text-sm rounded-md border border-gray-300"
+                disabled={assigning}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitCredentials}
+                disabled={assigning}
+                className="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
+              >
+                {assigning ? "Assigning..." : "Assign"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showDeleteModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
@@ -209,7 +314,6 @@ const UserList = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

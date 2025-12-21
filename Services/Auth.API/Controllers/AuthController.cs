@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
             return BadRequest(ApiResponse<string>.Fail("Email and password are required."));
 
-        var user = await _db.UserAccounts.FirstOrDefaultAsync(u => u.Email.ToString() == req.Email || u.PasswordHash != null);
+        var user = await _db.UserAccounts.FirstOrDefaultAsync(u => u.Email.ToString() == req.Email);
 
         if (user == null)
             return Unauthorized(ApiResponse<string>.Fail("Invalid credentials."));
@@ -54,25 +54,48 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserAccountDto req)
     {
-        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password) || string.IsNullOrWhiteSpace(req.Id) || string.IsNullOrWhiteSpace(req.Role))
+        if (string.IsNullOrWhiteSpace(req.Email) ||
+            string.IsNullOrWhiteSpace(req.Password) ||
+            string.IsNullOrWhiteSpace(req.Id) ||
+            string.IsNullOrWhiteSpace(req.Role))
+        {
             return BadRequest(ApiResponse<string>.Fail("Invalid payload"));
+        }
 
-        var user = await _db.UserAccounts.FirstOrDefaultAsync(u => u.Email.ToString() == req.Email);
-
-        if (user != null)
-            return BadRequest(ApiResponse<string>.Fail("User already exists."));
+        var user = await _db.UserAccounts
+                            .FirstOrDefaultAsync(u => u.Email == req.Email);
 
         var passwordHash = PasswordHelper.HashPassword(req.Password);
-        UserAccount account = new UserAccount()
+
+        if (user != null)
+        {
+            user.PasswordHash = passwordHash;
+            user.Role = req.Role;
+
+            _db.UserAccounts.Update(user);
+            await _db.SaveChangesAsync();
+
+            return Ok(ApiResponse<bool>.Success(
+                true,
+                "Employee credentials updated successfully"
+            ));
+        }
+
+        var account = new UserAccount
         {
             Id = req.Id,
             Email = req.Email,
             Role = req.Role,
-            PasswordHash = passwordHash,
+            PasswordHash = passwordHash
         };
 
         _db.UserAccounts.Add(account);
         await _db.SaveChangesAsync();
-        return Ok(ApiResponse<bool>.Success(true, "Employee Credentials Created"));
+
+        return Ok(ApiResponse<bool>.Success(
+            true,
+            "Employee credentials created successfully"
+        ));
     }
+
 }

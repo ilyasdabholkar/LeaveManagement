@@ -2,11 +2,7 @@ const router = require("express").Router();
 const emailService = require("../services/emailService");
 const smsService = require("../services/smsService");
 
-/**
- * POST /api/notifications/welcome
- * Send welcome email to new user
- * Called from User Service
- */
+
 router.post("/welcome", async (req, res) => {
     try {
         const { to, name } = req.body;
@@ -54,11 +50,6 @@ router.post("/welcome", async (req, res) => {
     }
 });
 
-/**
- * POST /api/notifications/otp
- * Send OTP via SMS
- * Called from Auth Service
- */
 router.post("/otp", async (req, res) => {
     try {
         const { phone, otp } = req.body;
@@ -106,11 +97,6 @@ router.post("/otp", async (req, res) => {
     }
 });
 
-/**
- * POST /api/notifications/leave-approved
- * Send leave approval/rejection email
- * Called from Leave Service
- */
 router.post("/leave-approved", async (req, res) => {
     try {
         const { to, employeeName, leaveType, days, status } = req.body;

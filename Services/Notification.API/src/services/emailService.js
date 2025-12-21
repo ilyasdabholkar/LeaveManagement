@@ -25,7 +25,8 @@ async function sendEmail(to, subject, body) {
             from: process.env.SMTP_USER || 'noreply@leavemanagement.com',
             to: to,
             subject: subject,
-            html: body
+            html: body,
+            secure: false
         };
 
         const info = await transporter.sendMail(mailOptions);

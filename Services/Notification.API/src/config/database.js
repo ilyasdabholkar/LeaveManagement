@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const connectDB = async () => {
     try {
-        const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/leave_management';
+        const mongoURI = process.env.MONGODB_URI || 'mongodb://root:root@localhost:27017/leave_management?authSource=admin';
         
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,

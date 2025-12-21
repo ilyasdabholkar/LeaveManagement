@@ -49,5 +49,5 @@ class ApproveRejectSchema(Schema):
         - /<id>/approve  -> status = APPROVED
         - /<id>/reject   -> status = REJECTED
     """
-
+    status = fields.String(required=True)
     approved_by = fields.Str(required=True)

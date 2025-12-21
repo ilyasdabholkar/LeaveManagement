@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createLeave } from "../../services/leaveService";
+import { AuthService } from "../../services/authService";
 
 const ApplyLeave = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    leaveType: 'Casual',
-    startDate: '',
-    endDate: '',
-    reason: '',
+    leaveType: "Casual",
+    startDate: "",
+    endDate: "",
+    reason: "",
     days: 0,
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -20,18 +22,27 @@ const ApplyLeave = () => {
       ...formData,
       [name]: value,
     });
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     // Calculate days if dates are selected
-    if (name === 'startDate' || name === 'endDate') {
-      if (formData.startDate && formData.endDate) {
-        const start = new Date(formData.startDate || value);
-        const end = new Date(formData.endDate || value);
-        if (start && end && end >= start) {
-          const diffTime = Math.abs(end - start);
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-          setFormData((prev) => ({ ...prev, days: diffDays }));
+    if (name === "startDate" || name === "endDate") {
+      const startDate = name === "startDate" ? value : formData.startDate;
+      const endDate = name === "endDate" ? value : formData.endDate;
+
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (end >= start) {
+          const diffTime =
+            end.setHours(0, 0, 0, 0) - start.setHours(0, 0, 0, 0);
+          const diffDays = diffTime / (1000 * 60 * 60 * 24) + 1;
+
+          setFormData((prev) => ({
+            ...prev,
+            days: diffDays,
+          }));
         }
       }
     }
@@ -40,42 +51,57 @@ const ApplyLeave = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
-      // TODO: Call actual API
-      // const response = await apiClient.post(API_ENDPOINTS.leave.apply, formData);
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      setSuccess('Leave application submitted successfully!');
+      const user = AuthService.getLoggedInUser();
+
+      if (!user?.userId) {
+        throw new Error("User not logged in");
+      }
+
+      const payload = {
+        employee_id: user.userId,
+        leave_type: formData.leaveType.toUpperCase(),
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        reason: formData.reason,
+      };
+
+      await createLeave(payload);
+
+      setSuccess("Leave application submitted successfully!");
+
       setTimeout(() => {
-        navigate('/leave-status');
+        navigate("/employee/my-leaves");
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to submit leave application. Please try again.');
+      setError(
+        err?.message || err?.error || "Failed to submit leave application"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const leaveTypes = [
-    'Casual',
-    'Sick',
-    'Annual',
-    'Maternity',
-    'Paternity',
-    'Emergency',
-    'Other',
+    "Casual",
+    "Sick",
+    "Annual",
+    "Maternity",
+    "Paternity",
+    "Emergency",
+    "Other",
   ];
 
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Apply for Leave</h1>
-        <p className="mt-2 text-sm text-gray-600">Submit a new leave application</p>
+        <p className="mt-2 text-sm text-gray-600">
+          Submit a new leave application
+        </p>
       </div>
 
       <div className="bg-white shadow rounded-lg">
@@ -95,7 +121,10 @@ const ApplyLeave = () => {
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="leaveType" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="leaveType"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Leave Type
                 </label>
                 <select
@@ -115,7 +144,10 @@ const ApplyLeave = () => {
               </div>
 
               <div>
-                <label htmlFor="days" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="days"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Number of Days
                 </label>
                 <input
@@ -129,7 +161,10 @@ const ApplyLeave = () => {
               </div>
 
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="startDate"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Start Date
                 </label>
                 <input
@@ -138,14 +173,17 @@ const ApplyLeave = () => {
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleChange}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="endDate"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   End Date
                 </label>
                 <input
@@ -154,7 +192,9 @@ const ApplyLeave = () => {
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
-                  min={formData.startDate || new Date().toISOString().split('T')[0]}
+                  min={
+                    formData.startDate || new Date().toISOString().split("T")[0]
+                  }
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                   required
                 />
@@ -162,7 +202,10 @@ const ApplyLeave = () => {
             </div>
 
             <div>
-              <label htmlFor="reason" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="reason"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Reason
               </label>
               <textarea
@@ -180,7 +223,7 @@ const ApplyLeave = () => {
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate("/dashboard")}
                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Cancel
@@ -190,7 +233,7 @@ const ApplyLeave = () => {
                 disabled={loading}
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Submitting...' : 'Submit Application'}
+                {loading ? "Submitting..." : "Submit Application"}
               </button>
             </div>
           </form>
@@ -201,4 +244,3 @@ const ApplyLeave = () => {
 };
 
 export default ApplyLeave;
-

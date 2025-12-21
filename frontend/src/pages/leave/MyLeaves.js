@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import apiClient from '../../services/api';
-import { API_ENDPOINTS } from '../../config/api';
+import { getLeavesByEmployee } from '../../services/leaveService';
+import { AuthService } from '../../services/authService';
 
 const MyLeaves = () => {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = AuthService.getLoggedInUser();
 
   useEffect(() => {
     fetchLeaves();
@@ -14,22 +14,10 @@ const MyLeaves = () => {
 
   const fetchLeaves = async () => {
     try {
-      // Fetch employee's leaves
-      const response = await apiClient.get(`${API_ENDPOINTS.leave.list}?employeeId=${user.id || user.userId}`);
-      setLeaves(response.data?.data || []);
+      const leaves = await getLeavesByEmployee(user);
+      setLeaves(leaves);
     } catch (error) {
       console.error('Error fetching leaves:', error);
-      // Mock data for development
-      setLeaves([
-        {
-          id: '1',
-          leaveType: 'CASUAL',
-          startDate: '2024-12-10',
-          endDate: '2024-12-12',
-          status: 'PENDING',
-          reason: 'Personal work',
-        },
-      ]);
     } finally {
       setLoading(false);
     }
@@ -114,14 +102,14 @@ const MyLeaves = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {leaves.map((leave) => {
-                    const startDate = new Date(leave.startDate);
-                    const endDate = new Date(leave.endDate);
+                    const startDate = new Date(leave.start_date);
+                    const endDate = new Date(leave.end_date);
                     const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                     
                     return (
                       <tr key={leave.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {leave.leaveType}
+                          {leave.leave_type}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}

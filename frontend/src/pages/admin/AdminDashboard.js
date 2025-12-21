@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import apiClient from '../../services/api';
-import { API_ENDPOINTS } from '../../config/api';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { fetchDashboardStats } from "../../services/adminService";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -20,42 +19,13 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
-      // Fetch employees count
-      const employeesRes = await apiClient.get(API_ENDPOINTS.employees.list);
-      const totalEmployees = employeesRes.data?.data?.length || 0;
 
-      // Fetch pending leaves
-      const pendingRes = await apiClient.get(`${API_ENDPOINTS.leave.list}?status=PENDING`);
-      const pendingLeaves = pendingRes.data?.data?.length || 0;
+      const { stats, recentLeaves } = await fetchDashboardStats();
 
-      // Fetch approved leaves
-      const approvedRes = await apiClient.get(`${API_ENDPOINTS.leave.list}?status=APPROVED`);
-      const approvedLeaves = approvedRes.data?.data?.length || 0;
-
-      // Fetch rejected leaves
-      const rejectedRes = await apiClient.get(`${API_ENDPOINTS.leave.list}?status=REJECTED`);
-      const rejectedLeaves = rejectedRes.data?.data?.length || 0;
-
-      // Fetch recent pending leave requests
-      const recentRes = await apiClient.get(`${API_ENDPOINTS.leave.list}?status=PENDING&limit=5`);
-      setRecentLeaves(recentRes.data?.data || []);
-
-      setStats({
-        totalEmployees,
-        pendingLeaves,
-        approvedLeaves,
-        rejectedLeaves,
-      });
+      setStats(stats);
+      setRecentLeaves(recentLeaves);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      // Set mock data on error for development
-      setStats({
-        totalEmployees: 25,
-        pendingLeaves: 5,
-        approvedLeaves: 45,
-        rejectedLeaves: 3,
-      });
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -63,30 +33,30 @@ const AdminDashboard = () => {
 
   const statCards = [
     {
-      title: 'Total Employees',
+      title: "Total Employees",
       value: stats.totalEmployees,
-      color: 'bg-blue-500',
-      icon: '👥',
-      link: '/admin/employees',
+      color: "bg-blue-500",
+      icon: "👥",
+      link: "/admin/employees",
     },
     {
-      title: 'Pending Leaves',
+      title: "Pending Leaves",
       value: stats.pendingLeaves,
-      color: 'bg-yellow-500',
-      icon: '⏳',
-      link: '/admin/approve-leave',
+      color: "bg-yellow-500",
+      icon: "⏳",
+      link: "/admin/approve-leave",
     },
     {
-      title: 'Approved Leaves',
+      title: "Approved Leaves",
       value: stats.approvedLeaves,
-      color: 'bg-green-500',
-      icon: '✅',
+      color: "bg-green-500",
+      icon: "✅",
     },
     {
-      title: 'Rejected Leaves',
+      title: "Rejected Leaves",
       value: stats.rejectedLeaves,
-      color: 'bg-red-500',
-      icon: '❌',
+      color: "bg-red-500",
+      icon: "❌",
     },
   ];
 
@@ -104,7 +74,9 @@ const AdminDashboard = () => {
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="mt-2 text-sm text-gray-600">Overview of your leave management system</p>
+        <p className="mt-2 text-sm text-gray-600">
+          Overview of your leave management system
+        </p>
       </div>
 
       {/* Stats Grid */}
@@ -112,8 +84,10 @@ const AdminDashboard = () => {
         {statCards.map((stat, index) => (
           <Link
             key={index}
-            to={stat.link || '#'}
-            className={`bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow ${!stat.link ? 'cursor-default' : ''}`}
+            to={stat.link || "#"}
+            className={`bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow ${
+              !stat.link ? "cursor-default" : ""
+            }`}
           >
             <div className="p-5">
               <div className="flex items-center">
@@ -122,8 +96,12 @@ const AdminDashboard = () => {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">{stat.title}</dt>
-                    <dd className="text-3xl font-semibold text-gray-900">{stat.value}</dd>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {stat.title}
+                    </dt>
+                    <dd className="text-3xl font-semibold text-gray-900">
+                      {stat.value}
+                    </dd>
                   </dl>
                 </div>
               </div>
@@ -136,7 +114,9 @@ const AdminDashboard = () => {
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Leave Requests</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900">
+              Recent Leave Requests
+            </h3>
             <Link
               to="/admin/approve-leave"
               className="text-sm text-primary-600 hover:text-primary-900 font-medium"
@@ -156,10 +136,11 @@ const AdminDashboard = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">
-                          {leave.employeeName || 'Employee'}
+                          {leave.employeeName || "Employee"}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {leave.leaveType} • {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
+                          {leave.leave_type} • {leave.start_date} -{" "}
+                          {leave.end_date}
                         </p>
                       </div>
                       <div className="ml-4">
@@ -180,4 +161,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

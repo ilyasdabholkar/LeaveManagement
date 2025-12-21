@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { AuthService } from '../services/authService';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = AuthService.getLoggedInUser();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -26,7 +27,7 @@ const Layout = ({ children }) => {
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <Link
-                  to="/dashboard"
+                  to={user.role === 'ADMIN' ? "/admin/dashboard" : "/dashboard"}
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/dashboard')
                       ? 'border-primary-500 text-gray-900'
@@ -35,7 +36,7 @@ const Layout = ({ children }) => {
                 >
                   Dashboard
                 </Link>
-                <Link
+                {user.role !== 'ADMIN' ?<Link
                   to="/apply-leave"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/apply-leave')
@@ -44,18 +45,18 @@ const Layout = ({ children }) => {
                   }`}
                 >
                   Apply Leave
-                </Link>
-                <Link
-                  to="/leave-status"
+                </Link> : <></>}
+                {user.role !== 'ADMIN' ?<Link
+                  to="/employee/my-leaves"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    isActive('/leave-status')
+                    isActive('/employee/my-leaves')
                       ? 'border-primary-500 text-gray-900'
                       : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                   }`}
                 >
                   Leave Status
-                </Link>
-                {user.role == 'ADMIN' ?<Link
+                  </Link> : <></>}
+                {user.role === 'ADMIN' ?<Link
                   to="/admin/approve-leave"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/admin/approve-leave')
@@ -65,7 +66,7 @@ const Layout = ({ children }) => {
                 >
                   Approve Leave
                 </Link> : <></>}
-                {user.role == 'ADMIN' ?<Link
+                {user.role === 'ADMIN' ?<Link
                   to="/admin/users"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/admin/users')
@@ -75,7 +76,7 @@ const Layout = ({ children }) => {
                 >
                   Users
                 </Link>  : <></>}
-                {user.role == 'ADMIN' ? <Link
+                {user.role === 'ADMIN' ? <Link
                   to="/developer/notifications"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/developer/notifications')

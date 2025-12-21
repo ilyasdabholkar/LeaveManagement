@@ -28,8 +28,8 @@ class Leave(db.Model):
 
     __tablename__ = "leaves"
 
-    id = db.Column(db.String(36), primary_key=True, default=gen_uuid)
-    employee_id = db.Column(db.String(36), nullable=False, index=True)
+    id = db.Column(db.String(50), primary_key=True, default=gen_uuid)
+    employee_id = db.Column(db.String(50), nullable=False, index=True)
     # Allowed values are enforced by the schema layer (marshmallow),
     # but we document them here for reference.
     leave_type = db.Column(db.String(20), nullable=False)
@@ -42,7 +42,7 @@ class Leave(db.Model):
         default="PENDING",  # 'PENDING','APPROVED','REJECTED','CANCELLED'
     )
     applied_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    approved_by = db.Column(db.String(36), nullable=True)
+    approved_by = db.Column(db.String(50), nullable=True)
     approved_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self) -> dict:

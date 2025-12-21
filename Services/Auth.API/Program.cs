@@ -1,4 +1,5 @@
 using Auth.API.Database;
+using Auth.API.Database.Seed;
 using Auth.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -29,6 +30,14 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    await dbContext.Database.MigrateAsync();
+    await AppDbSeeder.SeedAsync(dbContext);
 }
 
 app.UseCors("AllowAll");

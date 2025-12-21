@@ -4,20 +4,20 @@ from db import db
 from flask_migrate import Migrate
 from routes import bp as leave_bp
 import os
+from flask_cors import CORS
 
+migrate = Migrate()  
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+   
+    # Initialize DB
     db.init_app(app)
-    Migrate(app, db)
+    migrate.init_app(app, db)  # ✅ correct for app factory
 
-    # Build full Auth verify URL for routes.verify_token_from_header
-    # AUTH_SERVICE_URL + AUTH_VERIFY_ENDPOINT  (from Config / env)
-    auth_verify_endpoint = app.config.get("AUTH_VERIFY_ENDPOINT", "/api/auth/verify")
-    app.config["AUTH_VERIFY_URL"] = app.config.get("AUTH_SERVICE_URL", "http://localhost:5003").rstrip("/") + auth_verify_endpoint
-
+    CORS(app)
     # Optional: allow skipping auth locally by setting SKIP_AUTH=True in .env
     # Useful when Auth service is not running on your machine.
     app.config["SKIP_AUTH"] = os.getenv("SKIP_AUTH", "False").lower() in ("1", "true", "yes")
