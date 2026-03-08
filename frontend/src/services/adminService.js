@@ -98,4 +98,6 @@ export const fetchLeavesWithEmployees = async ({
   } catch (error) {
     throw error.response?.data || error.message;
   }
+
+  
 };

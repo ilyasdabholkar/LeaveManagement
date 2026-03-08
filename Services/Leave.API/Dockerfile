@@ -6,9 +6,6 @@ ENV FLASK_APP=app:create_app
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y default-mysql-client \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY Services/Leave.API/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

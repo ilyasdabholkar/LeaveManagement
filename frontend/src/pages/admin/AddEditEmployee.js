@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiClient from '../../services/api';
-import { API_ENDPOINTS } from '../../config/api';
 import { createEmployee,updateEmployee,getEmployeeById } from '../../services/employeeService';
 
 const AddEditEmployee = () => {

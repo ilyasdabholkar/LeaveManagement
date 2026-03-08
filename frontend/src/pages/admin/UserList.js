@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getEmployees, deleteEmployee } from "../../services/employeeService";
 import { AuthService } from "../../services/authService";
+import { sendCredentialsNotification } from "../../services/notificationService";
 import { FiEdit2, FiTrash2, FiKey } from "react-icons/fi";
 
 
@@ -89,6 +90,13 @@ const UserList = () => {
       await AuthService.assignCredentials({
         id: credentialUser.id,
         email: credentialUser.email,
+        role: "EMPLOYEE",
+        password,
+      });
+
+      await sendCredentialsNotification({
+        email: credentialUser.email,
+        firstName: credentialUser.firstName,
         role: "EMPLOYEE",
         password,
       });

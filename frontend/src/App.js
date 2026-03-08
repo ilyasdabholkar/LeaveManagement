@@ -17,9 +17,6 @@ import ApproveLeave from './pages/admin/ApproveLeave';
 import UserList from './pages/admin/UserList';
 import AddEditEmployee from './pages/admin/AddEditEmployee';
 
-// Developer Pages
-import NotificationTesting from './pages/developer/NotificationTesting';
-
 // Layout Component
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
@@ -135,16 +132,6 @@ function App() {
                 <LeaveDetails />
               </Layout>
             </PrivateRoute>
-          }
-        />
-
-        {/* Developer Routes */}
-        <Route
-          path="/developer/notifications"
-          element={
-            <Layout>
-              <NotificationTesting />
-            </Layout>
           }
         />
 

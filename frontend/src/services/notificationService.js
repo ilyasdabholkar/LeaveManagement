@@ -1,31 +1,24 @@
 import apiClient from './api';
 import { API_ENDPOINTS } from '../config/api';
 
-/**
- * Send welcome email
- */
-export const sendWelcomeEmail = async (to, name) => {
+export const sendCredentialsNotification = async ({
+  email,
+  firstName,
+  role,
+  password,
+}) => {
   try {
-    const response = await apiClient.post(API_ENDPOINTS.notifications.welcome, {
-      to,
-      name,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
-};
+    const res = await apiClient.post(
+      API_ENDPOINTS.notifications.sendCredentials,
+      {
+        email,
+        firstName,
+        role,
+        password,
+      }
+    );
 
-/**
- * Send OTP via SMS
- */
-export const sendOTPSMS = async (phone, otp) => {
-  try {
-    const response = await apiClient.post(API_ENDPOINTS.notifications.otp, {
-      phone,
-      otp,
-    });
-    return response.data;
+    return res.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }

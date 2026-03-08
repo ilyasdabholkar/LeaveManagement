@@ -1,6 +1,18 @@
+networks:
+  lm_network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local
+  mysql_data:
+    driver: local
+  mongo_data:
+    driver: local
+
 services:
   lm_sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/azure-sql-edge:latest 
     container_name: lm_sql
     environment:
       SA_PASSWORD: "StrongPassword@123"
@@ -8,8 +20,17 @@ services:
     ports:
       - "1435:1433"
     volumes:
-      - lm_sql_data:/var/opt/mssql
-  
+      - sqlserver_data:/var/opt/mssql 
+    user: root
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - lm_network
+
   lm_mysql:
     image: mysql:8.0
     container_name: lm_mysql
@@ -19,13 +40,15 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - lm_mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 5s
       timeout: 5s
       retries: 10
-  
+    networks:
+      - lm_network
+
   lm_mongo:
     image: mongo:7
     container_name: lm_mongo
@@ -35,7 +58,9 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
-      - lm_mongo_data:/data/db
+      - mongo_data:/data/db
+    networks:
+      - lm_network
 
   lm_employee_api:
     build:
@@ -45,7 +70,8 @@ services:
     ports:
       - "5002:8080"
     depends_on:
-      - lm_sqlserver
+      lm_sqlserver:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: >
@@ -54,6 +80,8 @@ services:
         User Id=sa;
         Password=StrongPassword@123;
         TrustServerCertificate=True;
+    networks:
+      - lm_network
 
   lm_auth_api:
     build:
@@ -63,7 +91,8 @@ services:
     ports:
       - "5001:8080"
     depends_on:
-      - lm_sqlserver
+      lm_sqlserver:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: >
@@ -72,6 +101,8 @@ services:
         User Id=sa;
         Password=StrongPassword@123;
         TrustServerCertificate=True;
+    networks:
+      - lm_network
 
   lm_leave_api:
     build:
@@ -85,7 +116,8 @@ services:
         condition: service_healthy
     env_file:
       - Services/Leave.API/.env
-
+    networks:
+      - lm_network
 
   lm_notification_api:
     build:
@@ -98,6 +130,8 @@ services:
       - Services/Notification.API/.env
     depends_on:
       - lm_mongo
+    networks:
+      - lm_network
 
   lm_frontend:
     build:
@@ -111,8 +145,5 @@ services:
       - lm_employee_api
       - lm_leave_api
       - lm_notification_api
-
-volumes:
-  lm_sql_data:
-  lm_mysql_data:
-  lm_mongo_data:
+    networks:
+      - lm_network

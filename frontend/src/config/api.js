@@ -1,11 +1,10 @@
-// API Gateway base URL
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 const AUTH_API_BASE_URL = process.env.REACT_APP_AUTH_URL 
 const EMPLOYEE_API_BASE_URL = process.env.REACT_APP_EMPLOYEE_URL 
 const LEAVE_API_BASE_URL = process.env.REACT_APP_LEAVE_URL
+const NOTIFICATION_API_BSE_URL = process.env.REACT_APP_NOTIFICATION_URL
 
-// API endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
   auth: {
@@ -31,9 +30,7 @@ export const API_ENDPOINTS = {
   },
   // Notification endpoints
   notifications: {
-    sendEmail: `${API_BASE_URL}/notifications/send-email`,
-    sendSMS: `${API_BASE_URL}/notifications/send-sms`,
-    getLogs: `${API_BASE_URL}/notifications/logs`,
+    sendCredentials: `${NOTIFICATION_API_BSE_URL}/notifications/send-credentials`,
   },
 };
 

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import apiClient from '../../services/api';
-import { API_ENDPOINTS } from '../../config/api';
 import { fetchLeavesWithEmployees } from '../../services/adminService';
 import { approveLeave, rejectLeave } from '../../services/leaveService';
 import { AuthService } from '../../services/authService';
